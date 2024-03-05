@@ -97,6 +97,7 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
 
     if(fp == NULL) {
         perror("Error opening /proc/pid/ststus\n");
+        fclose(fp);
         return root;
     }
 
@@ -120,20 +121,34 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
     // read FD info
     struct stat statbuf;
     sprintf(path, "/proc/%s/fp", dir->d_name);
-    setuid(getuid());
-    DIR* proc = opendir(path);
+    DIR* dirp = NULL;
+    dirp = opendir(path);
+    printf("%s\n",path);
 
-    if(proc == NULL) return root;
+    if(dirp == NULL) 
+    {
+        if(errno == EACCES) printf("permission denied\n");
+        else if (errno == ENOTDIR)
+        {
+            printf("not a directory");
+        }
+        else if (errno == EMFILE)
+        {
+            printf("limit reach\n");
+        }
+        else printf("%d\n",errno);
+        return root;
+    }
 
     struct dirent* fdDir;
     
-    while((fdDir = readdir(proc)) != NULL) {
+    while((fdDir = readdir(dirp)) != NULL) {
         long fd = strtol(fdDir->d_name, NULL, 10);
         fdNode* f = createFDNode(fd);
         FD = insertFDNode(FD, f);
         printf("got fd: %ld\n", fd);
     }
-    closedir(proc);
+    closedir(dirp);
 
     processInfoNode* newNode = creatProcessNode(pid, inode, FD, name);
     root = insertProcessNode(root, newNode);
