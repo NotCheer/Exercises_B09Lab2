@@ -10,46 +10,11 @@
 #include<stdlib.h>
 #include<string.h>
 
+#include "ProcessStruct.h"
+
 #define _POSIX_C_SOURCE 200809L
 
 #define MAX_STR_LEN 256
-
-typedef struct Arguments {
-    bool perProcess;
-    bool systemWidth;
-    bool vnodes;
-    bool composite;
-    bool outputTXT;
-    bool outputBinary;
-    int threshold;
-} arguments;
-
-typedef struct FDNode {
-    int FD;
-
-    struct FDNode* next;
-} fdNode;
-
-typedef struct ProcessInfoNode {
-    int PID;
-    int Inode;
-    char filename[MAX_STR_LEN];
-    fdNode* FD;
-
-    struct ProcessInfoNode* next;
-} processInfoNode;
-
-fdNode* createFDNode(int FD) {
-    fdNode* newNode = (fdNode*)malloc(sizeof(fdNode));
-    newNode->FD = FD;
-    newNode->next = NULL;
-    return newNode;
-}
-
-fdNode* insertFDNode(fdNode* root, fdNode* node) {
-    if(root == NULL) return node;
-    root->next = insertFDNode(root->next, node);
-}
 
 int isProcessOwner(char* path) {
     struct stat statbuf;
@@ -64,22 +29,6 @@ int isProcessOwner(char* path) {
 
     if(statbuf.st_uid == uid && statbuf.st_gid == gid) return 0;
     return -1;
-}
-
-processInfoNode* creatProcessNode(int PID, int Inode, fdNode* FD, char* filename) {
-    processInfoNode* newNode = (processInfoNode*)malloc(sizeof(processInfoNode));
-    newNode->PID = PID;
-    newNode->FD = FD;
-    newNode->Inode = Inode;
-    strcpy(newNode->filename, filename);
-    newNode->next = NULL;
-    return newNode;
-}
-
-processInfoNode* insertProcessNode(processInfoNode* root, processInfoNode* node) {
-    if(root == NULL) return node;
-    node->next = insertProcessNode(root->next, node);
-    return root;
 }
 
 // get info of a process given by the fd at `dir`, store it in linked list rooted at root
@@ -120,24 +69,13 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
 
     //////////////////////////////////////////
     // read FD info
-    struct stat statbuf;
-    sprintf(path, "/proc/%s/fp", dir->d_name);
+    sprintf(path, "/proc/%s/fd", dir->d_name);
     DIR* dirp = NULL;
     dirp = opendir(path);
     printf("%s\n",path);
 
     if(dirp == NULL) 
     {
-        if(errno == EACCES) printf("permission denied\n");
-        else if (errno == ENOTDIR)
-        {
-            printf("not a directory");
-        }
-        else if (errno == EMFILE)
-        {
-            printf("limit reach\n");
-        }
-        else printf("%d\n",errno);
         return root;
     }
 
