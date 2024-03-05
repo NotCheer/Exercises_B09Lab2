@@ -53,6 +53,7 @@ fdNode* insertFDNode(fdNode* root, fdNode* node) {
 
 int isProcessOwner(char* path) {
     struct stat statbuf;
+    printf("getting stat in: %s\n", path);
     if (stat(path, &statbuf) == -1) {
         perror("error getting stat.");
         return -2;
