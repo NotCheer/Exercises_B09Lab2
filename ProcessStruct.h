@@ -34,5 +34,6 @@ fdNode* createFDNode(int FD);
 fdNode* insertFDNode(fdNode* root, fdNode* node);
 processInfoNode* creatProcessNode(int PID, int Inode, fdNode* FD, char* filename);
 processInfoNode* insertProcessNode(processInfoNode* root, processInfoNode* node);
+void printProcessList(processInfoNode* root);
 
 #endif // PROCESS_STRUCT_H

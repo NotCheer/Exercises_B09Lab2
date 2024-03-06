@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-I.
+CFLAGS=-g -I.
 
 DEPS = ProcessStruct.h
 OBJ = MyFDViewer.o ProcessStruct.o 

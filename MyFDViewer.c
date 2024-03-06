@@ -18,7 +18,6 @@
 
 int isProcessOwner(char* path) {
     struct stat statbuf;
-    printf("getting stat in: %s\n", path);
     if (stat(path, &statbuf) == -1) {
         perror("error getting stat.");
         return -2;
@@ -72,7 +71,6 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
     sprintf(path, "/proc/%s/fd", dir->d_name);
     DIR* dirp = NULL;
     dirp = opendir(path);
-    printf("%s\n",path);
 
     if(dirp == NULL) 
     {
@@ -85,7 +83,6 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
         long fd = strtol(fdDir->d_name, NULL, 10);
         fdNode* f = createFDNode(fd);
         FD = insertFDNode(FD, f);
-        printf("got fd: %ld\n", fd);
     }
     closedir(dirp);
 
@@ -95,25 +92,25 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
 }
 
 // Open the `/proc` directory and initialize our ProcessInfoNode linked list
-int initFDList(processInfoNode* root) {
+int initFDList(processInfoNode** root) {
     DIR* proc = opendir("/proc");
     struct dirent* dir;
     int len = 0;
     
     while((dir = readdir(proc)) != NULL) {
         //printf("%ld, %s\n",dir->d_ino, dir->d_name);
-        root = retriveFDInfo(root, dir);
-        if(root) printf("%d\n",(root)->FD->FD);
+        *root = retriveFDInfo(*root, dir);
         len++;
     }
-
     closedir(proc);
     return len;
 }
 
 int main(int argc, char* argv[]) {
-    setuid(getuid());
+    int len = 0;
     
     processInfoNode* root = NULL;
-    initFDList(root);
+    len = initFDList(&root);
+    if(!root) printf("root is null");
+    printProcessList(root);
 }
