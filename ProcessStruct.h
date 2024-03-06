@@ -19,6 +19,8 @@ typedef struct Arguments {
 
 typedef struct FDNode {
     int FD;
+    int inode;
+    char filename[MAX_STR_LEN];
     struct FDNode* next;
 } fdNode;
 
@@ -30,10 +32,11 @@ typedef struct ProcessInfoNode {
     struct ProcessInfoNode* next;
 } processInfoNode;
 
-fdNode* createFDNode(int FD);
+fdNode* createFDNode(int FD, int inode, char* filename);
 fdNode* insertFDNode(fdNode* root, fdNode* node);
 processInfoNode* creatProcessNode(int PID, int Inode, fdNode* FD, char* filename);
 processInfoNode* insertProcessNode(processInfoNode* root, processInfoNode* node);
 void printProcessList(processInfoNode* root);
+int readArguments(int argc, char* argv[]);
 
 #endif // PROCESS_STRUCT_H

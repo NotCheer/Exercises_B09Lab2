@@ -1,9 +1,11 @@
 #include "ProcessStruct.h"
 #include<stdio.h>
 
-fdNode* createFDNode(int FD) {
+fdNode* createFDNode(int FD, int inode, char* filename) {
     fdNode* newNode = (fdNode*)malloc(sizeof(fdNode));
     newNode->FD = FD;
+    newNode->inode = inode;
+    strcpy(newNode->filename, filename);
     newNode->next = NULL;
     return newNode;
 }
@@ -46,10 +48,12 @@ void printProcessList(processInfoNode* root) {
         fdNode* f = root->FD;
         while(f)
         {
-            printf("%d  ", f->FD);
+            printf("%d: %s  ", f->FD, f->filename);
             f=f->next;
         }
         printf("\n--------------\n");
         root=root->next;
     }
 }
+
+int readArguments(int argc, char* argv[]);

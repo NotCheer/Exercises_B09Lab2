@@ -16,6 +16,7 @@
 
 #define MAX_STR_LEN 256
 
+// Determine if the current user owns the process given by `path`
 int isProcessOwner(char* path) {
     struct stat statbuf;
     if (stat(path, &statbuf) == -1) {
@@ -30,6 +31,16 @@ int isProcessOwner(char* path) {
     return -1;
 }
 
+bool _is_all_num(char* str)
+{
+    while(*str != '\0'){
+        if(*str<'0' || *str>'9') return false;
+        str++;
+    }
+    return true;
+}
+
+
 // get info of a process given by the fd at `dir`, store it in linked list rooted at root
 processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
     char path[MAX_STR_LEN];
@@ -38,6 +49,9 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
     long inode;
     int pid = -1;
     fdNode* FD=NULL;
+
+    if(!_is_all_num(dir->d_name)) return root;
+
     sprintf(path, "/proc/%s/fd", dir->d_name);
     if(isProcessOwner(path) != 0) return root;
     
@@ -78,10 +92,26 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
     }
 
     struct dirent* fdDir;
+    char fdFileName[MAX_STR_LEN];
+    int fdInode;
+    FILE* fdInfo;
+
+    struct stat statbuf;
     
     while((fdDir = readdir(dirp)) != NULL) {
         long fd = strtol(fdDir->d_name, NULL, 10);
-        fdNode* f = createFDNode(fd);
+        
+        sprintf(path, "/proc/%d/fd/%s", pid, fdDir->d_name);
+        ssize_t len;
+
+        stat(path, &statbuf);
+
+        if((len = readlink(path, fdFileName, sizeof(path)-1)) != -1)
+            fdFileName[len] = '\0';
+        else
+            strcpy(path, "/dev/null");
+
+        fdNode* f = createFDNode(fd, fdInode, fdFileName);
         FD = insertFDNode(FD, f);
     }
     closedir(dirp);
