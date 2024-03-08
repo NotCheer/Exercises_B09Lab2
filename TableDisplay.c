@@ -61,7 +61,7 @@ void assembleSystemWideTable(processInfoNode* head)
         fdNode* fd = head->FD;
         while(fd != NULL)
         {
-            printf("\t %d\t %d\n", head->PID, fd->FD);
+            printf("\t %d\t %d\t %s\n", head->PID, fd->FD, fd->filename);
             fd=fd->next;
         }
         head=head->next;
@@ -98,26 +98,60 @@ void assembleCompositeTable(processInfoNode* head)
     }
 }
 
+int getFDNumber(fdNode* fd)
+{
+    int len = 0;
+    while(fd != NULL)
+    {
+        len++;
+        fd=fd->next;
+    }
+    return len;
+}
+
+void printThreshold(processInfoNode* head, int threshold)
+{
+    int num;
+
+    printf("## Offending processes:\n");
+    while(head != NULL)
+    {
+        num = getFDNumber(head->FD);
+        if(num > threshold)
+            printf("%d(%d), ", head->PID, num);
+        head = head->next;
+    }
+    printf("\n");
+}
+
 void assemble(arguments* args, processInfoNode* head)
 {
     if(args->perProcess == true)
     {
         assembleHead(args);
         assemblePerProcessTable(head);
+        printf("\n\n");
     }
     if(args->systemWide == true)
     {
         assembleHead(args);
         assembleSystemWideTable(head);
+        printf("\n\n");
     }
     if(args->vnodes == true)
     {
         assembleHead(args);
         assembleVnodesTable(head);
+        printf("\n\n");
     }
     if(args->composite == true)
     {
         assembleHead(args);
         assembleCompositeTable(head);
+        printf("\n\n");
+    }
+    if(args->threshold != -1)
+    {
+        printThreshold(head, args->threshold);
     }
 }

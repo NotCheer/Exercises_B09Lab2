@@ -33,6 +33,7 @@ typedef struct ProcessInfoNode {
     struct ProcessInfoNode* next;
 } processInfoNode;
 
+bool _is_all_num(char* str);
 fdNode* createFDNode(int FD, int inode, char* filename);
 fdNode* insertFDNode(fdNode* root, fdNode* node);
 processInfoNode* creatProcessNode(int PID, int Inode, fdNode* FD, char* filename);

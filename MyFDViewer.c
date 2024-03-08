@@ -32,16 +32,6 @@ int isProcessOwner(char* path) {
     return -1;
 }
 
-bool _is_all_num(char* str)
-{
-    while(*str != '\0'){
-        if(*str<'0' || *str>'9') return false;
-        str++;
-    }
-    return true;
-}
-
-
 // get info of a process given by the fd at `dir`, store it in linked list rooted at root
 processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
     char path[MAX_STR_LEN];
@@ -110,11 +100,13 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
         
         if((len = readlink(path, fdFileName, sizeof(path)-1)) != -1)
             fdFileName[len] = '\0';
+        /*
         else
         {
             printf(path);
             perror("readlink:");
         }
+        */
             
 
         fdNode* f = createFDNode(fd, fdInode, fdFileName);
@@ -128,7 +120,7 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
 }
 
 // Open the `/proc` directory and initialize our ProcessInfoNode linked list
-int initFDList(processInfoNode** root) {
+int initFDList(arguments* args, processInfoNode** root) {
     DIR* proc = opendir("/proc");
     struct dirent* dir;
     int len = 0;
@@ -138,6 +130,7 @@ int initFDList(processInfoNode** root) {
         *root = retriveFDInfo(*root, dir);
         len++;
     }
+
     closedir(proc);
     return len;
 }
@@ -147,9 +140,9 @@ int main(int argc, char* argv[]) {
     arguments args;
     
     processInfoNode* root = NULL;
-    len = initFDList(&root);
+    len = initFDList(&args, &root);
     if(!root) printf("root is null");
-    printProcessList(root);
+    //printProcessList(root);
     readArguments(argc, argv, &args);
     assemble(&args, root);
 }
