@@ -99,6 +99,7 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
     struct stat statbuf;
     
     while((fdDir = readdir(dirp)) != NULL) {
+        if(strncmp(fdDir->d_name,".",1)==0 || strncmp(fdDir->d_name,"..",2)==0) continue;
         long fd = strtol(fdDir->d_name, NULL, 10);
         
         sprintf(path, "/proc/%d/fd/%s", pid, fdDir->d_name);
