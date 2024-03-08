@@ -110,7 +110,11 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
         if((len = readlink(path, fdFileName, sizeof(path)-1)) != -1)
             fdFileName[len] = '\0';
         else
-            perror("readlink");
+        {
+            printf(path);
+            perror("readlink:");
+        }
+            
 
         fdNode* f = createFDNode(fd, fdInode, fdFileName);
         FD = insertFDNode(FD, f);
