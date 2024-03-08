@@ -11,6 +11,7 @@
 #include<string.h>
 
 #include "ProcessStruct.h"
+#include "TableDisplay.h"
 
 #define _POSIX_C_SOURCE 200809L
 
@@ -138,9 +139,12 @@ int initFDList(processInfoNode** root) {
 
 int main(int argc, char* argv[]) {
     int len = 0;
+    arguments args;
     
     processInfoNode* root = NULL;
     len = initFDList(&root);
     if(!root) printf("root is null");
     printProcessList(root);
+    readArguments(argc, argv, &args);
+    assemble(&args, root);
 }

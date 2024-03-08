@@ -56,4 +56,19 @@ void printProcessList(processInfoNode* root) {
     }
 }
 
-int readArguments(int argc, char* argv[]);
+int readArguments(int argc, char* argv[], arguments* args)
+{
+    //init
+    args->perProcess=false;
+    args->systemWide=false;
+    args->vnodes=false;
+    args->composite=false;
+    args->outputBinary=false;
+    args->outputTXT=false;
+    args->threshold=-1;
+    args->pid=-1;
+
+    //default behaviour
+    if(!args->perProcess && !args->systemWide && !args->vnodes)
+        args->composite=true;
+}

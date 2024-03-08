@@ -1,8 +1,8 @@
 CC=gcc
 CFLAGS=-g -I.
 
-DEPS = ProcessStruct.h
-OBJ = MyFDViewer.o ProcessStruct.o 
+DEPS = ProcessStruct.h TableDisplay.h
+OBJ = MyFDViewer.o ProcessStruct.o TableDisplay.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)

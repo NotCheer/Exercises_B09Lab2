@@ -9,12 +9,13 @@
 
 typedef struct Arguments {
     bool perProcess;
-    bool systemWidth;
+    bool systemWide;
     bool vnodes;
     bool composite;
     bool outputTXT;
     bool outputBinary;
     int threshold;
+    int pid;
 } arguments;
 
 typedef struct FDNode {
@@ -37,6 +38,6 @@ fdNode* insertFDNode(fdNode* root, fdNode* node);
 processInfoNode* creatProcessNode(int PID, int Inode, fdNode* FD, char* filename);
 processInfoNode* insertProcessNode(processInfoNode* root, processInfoNode* node);
 void printProcessList(processInfoNode* root);
-int readArguments(int argc, char* argv[]);
+int readArguments(int argc, char* argv[], arguments* args);
 
 #endif // PROCESS_STRUCT_H
