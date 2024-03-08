@@ -106,11 +106,11 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
 
         stat(path, &statbuf);
         fdInode = statbuf.st_ino;
-
+        
         if((len = readlink(path, fdFileName, sizeof(path)-1)) != -1)
             fdFileName[len] = '\0';
         else
-            strcpy(path, "/dev/null");
+            perror("readlink");
 
         fdNode* f = createFDNode(fd, fdInode, fdFileName);
         FD = insertFDNode(FD, f);

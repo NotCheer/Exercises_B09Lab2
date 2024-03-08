@@ -66,6 +66,8 @@ void assembleSystemWideTable(processInfoNode* head)
         }
         head=head->next;
     }
+        head=head->next;
+    }
 }
 
 void assembleVnodesTable(processInfoNode* head)
@@ -92,9 +94,9 @@ void assembleCompositeTable(processInfoNode* head)
         {
             printf("%d\t %d\t %d\t %s\t\t %d\n", index, head->PID, fd->FD, fd->filename, fd->inode);
             fd=fd->next;
+            index++;
         }
         head=head->next;
-        index++;
     }
 }
 
