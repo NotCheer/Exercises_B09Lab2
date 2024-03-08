@@ -95,7 +95,6 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
     struct dirent* fdDir;
     char fdFileName[MAX_STR_LEN];
     int fdInode;
-    FILE* fdInfo;
 
     struct stat statbuf;
     
@@ -106,6 +105,7 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
         ssize_t len;
 
         stat(path, &statbuf);
+        fdInode = statbuf.st_ino;
 
         if((len = readlink(path, fdFileName, sizeof(path)-1)) != -1)
             fdFileName[len] = '\0';
