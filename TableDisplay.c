@@ -66,8 +66,6 @@ void assembleSystemWideTable(processInfoNode* head)
         }
         head=head->next;
     }
-        head=head->next;
-    }
 }
 
 void assembleVnodesTable(processInfoNode* head)
