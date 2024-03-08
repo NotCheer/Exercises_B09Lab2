@@ -40,5 +40,7 @@ processInfoNode* creatProcessNode(int PID, int Inode, fdNode* FD, char* filename
 processInfoNode* insertProcessNode(processInfoNode* root, processInfoNode* node);
 void printProcessList(processInfoNode* root);
 int readArguments(int argc, char* argv[], arguments* args);
+void deleteProcessList(processInfoNode* head);
+void deleteFDList(fdNode* head);
 
 #endif // PROCESS_STRUCT_H

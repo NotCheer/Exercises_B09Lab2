@@ -118,3 +118,18 @@ int readArguments(int argc, char* argv[], arguments* args)
     if(!args->perProcess && !args->systemWide && !args->vnodes)
         args->composite=true;
 }
+
+void deleteProcessList(processInfoNode* head)
+{
+    if(head == NULL) return;
+    deleteProcessList(head->next);
+    deleteFDList(head->FD);
+    free(head);
+}
+
+void deleteFDList(fdNode* head)
+{
+    if(head == NULL) return;
+    deleteFDList(head->next);
+    free(head);
+}

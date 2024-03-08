@@ -145,4 +145,5 @@ int main(int argc, char* argv[]) {
     //printProcessList(root);
     readArguments(argc, argv, &args);
     assemble(&args, root);
+    deleteProcessList(root);
 }
