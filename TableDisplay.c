@@ -45,7 +45,7 @@ void assemblePerProcessTable(processInfoNode* head)
         fdNode* fd = head->FD;
         while(fd != NULL)
         {
-            printf("%d\t %d\t %s\n", head->PID, fd->FD, fd->filename);
+            printf("\t %d\t %d\t %s\n", head->PID, fd->FD, fd->filename);
             fd=fd->next;
         }
         head=head->next;
@@ -61,7 +61,7 @@ void assembleSystemWideTable(processInfoNode* head)
         fdNode* fd = head->FD;
         while(fd != NULL)
         {
-            printf("%d\t %d\n", head->PID, fd->FD);
+            printf("\t %d\t %d\n", head->PID, fd->FD);
             fd=fd->next;
         }
         head=head->next;
@@ -75,7 +75,7 @@ void assembleVnodesTable(processInfoNode* head)
         fdNode* fd = head->FD;
         while(fd != NULL)
         {
-            printf("%d\t %d\n", fd->FD, fd->inode);
+            printf("\t %d\t %d\n", fd->FD, fd->inode);
             fd=fd->next;
         }
         head=head->next;
@@ -84,15 +84,17 @@ void assembleVnodesTable(processInfoNode* head)
 
 void assembleCompositeTable(processInfoNode* head)
 {
+    int index = 0;
     while(head != NULL)
     {
         fdNode* fd = head->FD;
         while(fd != NULL)
         {
-            printf("%d\t %d\t %s\t\t %d\n", head->PID, fd->FD, fd->filename, fd->inode);
+            printf("%d\t %d\t %d\t %s\t\t %d\n", index, head->PID, fd->FD, fd->filename, fd->inode);
             fd=fd->next;
         }
         head=head->next;
+        index++;
     }
 }
 
