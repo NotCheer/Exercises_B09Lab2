@@ -33,7 +33,7 @@ int isProcessOwner(char* path) {
 }
 
 // get info of a process given by the fd at `dir`, store it in linked list rooted at root
-processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
+processInfoNode* retriveProcessInfo(processInfoNode* root, struct dirent* dir) {
     char path[MAX_STR_LEN];
     char buffer[MAX_STR_LEN];
     char name[MAX_STR_LEN];
@@ -51,7 +51,6 @@ processInfoNode* retriveFDInfo(processInfoNode* root, struct dirent* dir) {
 
     if(fp == NULL) {
         perror("Error opening /proc/pid/ststus\n");
-        fclose(fp);
         return root;
     }
 
@@ -127,7 +126,7 @@ int initFDList(arguments* args, processInfoNode** root) {
     
     while((dir = readdir(proc)) != NULL) {
         //printf("%ld, %s\n",dir->d_ino, dir->d_name);
-        *root = retriveFDInfo(*root, dir);
+        *root = retriveProcessInfo(*root, dir);
         len++;
     }
 
@@ -140,10 +139,12 @@ int main(int argc, char* argv[]) {
     arguments args;
     
     processInfoNode* root = NULL;
-    len = initFDList(&args, &root);
+    initFDList(&args, &root);
     if(!root) printf("root is null");
     //printProcessList(root);
     readArguments(argc, argv, &args);
-    assemble(&args, root);
+    int assembleStatus = assemble(&args, root);
     deleteProcessList(root);
+    if (assembleStatus == -1) return -1;
+    return 0;
 }

@@ -7,12 +7,12 @@
 #include<stdlib.h>
 
 int getFDNumber(fdNode* fd);
-void assembleHead(arguments* args);
-void assemblePerProcessTable(processInfoNode* head);
-void assembleSystemWideTable(processInfoNode* head);
-void assembleVnodesTable(processInfoNode* head);
-void assembleCompositeTable(processInfoNode* head);
-void printThreshold(processInfoNode* head, int threshold);
-void assemble(arguments* args, processInfoNode* head);
+void assembleHead(arguments* args, FILE* binaryFP, FILE* txtFP);
+void assemblePerProcessTable(processInfoNode* head, FILE* binaryFP, FILE* txtFP);
+void assembleSystemWideTable(processInfoNode* head, FILE* binaryFP, FILE* txtFP);
+void assembleVnodesTable(processInfoNode* head, FILE* binaryFP, FILE* txtFP);
+void assembleCompositeTable(processInfoNode* head, FILE* binaryFP, FILE* txtFP);
+void printThreshold(processInfoNode* head, int threshold, FILE* binaryFP, FILE* txtFP);
+int assemble(arguments* args, processInfoNode* root);
 
 #endif

@@ -3,3 +3,5 @@ MyFDViewer
 .vscode
 MyFDViewer
 *.o
+*.bin
+*.txt
