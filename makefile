@@ -13,4 +13,7 @@ MyFDViewer: $(OBJ)
 .PHONY: clean
 
 clean:
-	rm -f *.o MyFDViewer
+	rm -f *.o MyFDViewer *.bin *.txt
+
+dist:
+	tar -czvf MyFDViewer.tar.gz *.c *.h makefile
