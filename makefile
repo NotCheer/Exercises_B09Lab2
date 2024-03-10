@@ -16,4 +16,4 @@ clean:
 	rm -f *.o MyFDViewer *.bin *.txt
 
 dist:
-	tar -czvf MyFDViewer.tar.gz *.c *.h makefile
+	tar -czvf MyFDViewer.tar.gz *.c *.h makefile README.md README.pdf
