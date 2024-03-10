@@ -13,11 +13,14 @@
 #include "ProcessStruct.h"
 #include "TableDisplay.h"
 
-#define _POSIX_C_SOURCE 200809L
-
 #define MAX_STR_LEN 256
 
-// Determine if the current user owns the process given by `path`
+/* 
+ * Determines if the current user owns the process given by `path`.
+ * 
+ * @param path: A string representing the path of the process.
+ * @return: Returns 0 if the current user owns the process, -1 if not, and -2 if there was an error getting the process info.
+ */
 int isProcessOwner(char* path) {
     struct stat statbuf;
     if (stat(path, &statbuf) == -1) {
@@ -32,8 +35,14 @@ int isProcessOwner(char* path) {
     return -1;
 }
 
-// get info of a process given by the fd at `dir`, store it in linked list rooted at root
-processInfoNode* retriveProcessInfo(processInfoNode* root, struct dirent* dir) {
+/* 
+ * Retrieves information of a process given by the file descriptor at `dir`, and stores it in a linked list rooted at `root`.
+ * 
+ * @param root: A pointer to the root of the process information linked list.
+ * @param dir: A pointer to a dirent structure representing the directory entry of the process.
+ * @return: A pointer to the root of the updated process information linked list.
+ */
+processInfoNode* retrieveProcessInfo(processInfoNode* root, struct dirent* dir) {
     char path[MAX_STR_LEN];
     char buffer[MAX_STR_LEN];
     char name[MAX_STR_LEN];
@@ -50,7 +59,7 @@ processInfoNode* retriveProcessInfo(processInfoNode* root, struct dirent* dir) {
     FILE* fp = fopen(path, "r");
 
     if(fp == NULL) {
-        perror("Error opening /proc/pid/ststus\n");
+        perror("Error opening /proc/pid/status\n");
         return root;
     }
 
@@ -87,16 +96,21 @@ processInfoNode* retriveProcessInfo(processInfoNode* root, struct dirent* dir) {
 
     struct stat statbuf;
     
+    // read through all fd
     while((fdDir = readdir(dirp)) != NULL) {
         if(strncmp(fdDir->d_name,".",1)==0 || strncmp(fdDir->d_name,"..",2)==0) continue;
+        
+        //get fd number
         long fd = strtol(fdDir->d_name, NULL, 10);
         
         sprintf(path, "/proc/%d/fd/%s", pid, fdDir->d_name);
         ssize_t len;
 
+        //get inode
         stat(path, &statbuf);
         fdInode = statbuf.st_ino;
         
+        //get file name
         if((len = readlink(path, fdFileName, sizeof(path)-1)) != -1)
             fdFileName[len] = '\0';
         /*
@@ -118,7 +132,13 @@ processInfoNode* retriveProcessInfo(processInfoNode* root, struct dirent* dir) {
     return root;
 }
 
-// Open the `/proc` directory and initialize our ProcessInfoNode linked list
+/* 
+ * Opens the `/proc` directory and initializes the ProcessInfoNode linked list.
+ * 
+ * @param args: A pointer to an `arguments` structure that contains the flags for the different types of tables.
+ * @param root: A pointer to a pointer to the root of the process information linked list.
+ * @return: The length of the process information linked list.
+ */
 int initFDList(arguments* args, processInfoNode** root) {
     DIR* proc = opendir("/proc");
     struct dirent* dir;
@@ -126,7 +146,7 @@ int initFDList(arguments* args, processInfoNode** root) {
     
     while((dir = readdir(proc)) != NULL) {
         //printf("%ld, %s\n",dir->d_ino, dir->d_name);
-        *root = retriveProcessInfo(*root, dir);
+        *root = retrieveProcessInfo(*root, dir);
         len++;
     }
 
@@ -134,6 +154,14 @@ int initFDList(arguments* args, processInfoNode** root) {
     return len;
 }
 
+
+/* 
+ * The main function of the program. It initializes the process information linked list, reads the command line arguments, assembles the desired table, and then deletes the process list.
+ * 
+ * @param argc: The number of arguments passed to the program.
+ * @param argv: An array of strings representing the arguments passed to the program.
+ * @return: 0 upon successful execution, -1 if there was an error.
+ */
 int main(int argc, char* argv[]) {
     int len = 0;
     arguments args;
@@ -142,9 +170,10 @@ int main(int argc, char* argv[]) {
     initFDList(&args, &root);
     if(!root) printf("root is null");
     //printProcessList(root);
-    readArguments(argc, argv, &args);
-    int assembleStatus = assemble(&args, root);
+    int status = readArguments(argc, argv, &args);
+    if (status < 0) return -1;
+    status += assemble(&args, root);
     deleteProcessList(root);
-    if (assembleStatus == -1) return -1;
+    if (status < 0) return -1;
     return 0;
 }

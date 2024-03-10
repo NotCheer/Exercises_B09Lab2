@@ -55,9 +55,14 @@ void assemblePerProcessTable(processInfoNode* head, FILE* binaryFP, FILE* txtFP)
         fdNode* fd = head->FD;
         while(fd != NULL)
         {
-            sprintf(buffer, "\t %d\t %d\t %s\n", head->PID, fd->FD, fd->filename);
+            sprintf(buffer, "\t %d\t %d\n", head->PID, fd->FD);
             printf("%s",buffer);
-            if(binaryFP != NULL) fprintf(binaryFP, buffer);
+            if(binaryFP != NULL) 
+            {
+                int intBuf[2] = {head->PID, fd->FD};
+                fwrite(intBuf, sizeof(int), sizeof(intBuf) / sizeof(int), binaryFP);
+                fprintf(binaryFP, "\n");
+            }
             if(txtFP != NULL) fprintf(txtFP, "%s", buffer);
             fd=fd->next;
         }
@@ -77,7 +82,13 @@ void assembleSystemWideTable(processInfoNode* head, FILE* binaryFP, FILE* txtFP)
         {
             sprintf(buffer, "\t %d\t %d\t %s\n", head->PID, fd->FD, fd->filename);
             printf("%s",buffer);
-            if(binaryFP != NULL) fprintf(binaryFP, buffer);
+            if(binaryFP != NULL) 
+            {
+                int intBuf[2] = {head->PID, fd->FD};
+                fwrite(intBuf, sizeof(int), sizeof(intBuf) / sizeof(int), binaryFP);
+                fwrite(fd->filename, sizeof(char), strlen(fd->filename), binaryFP);
+                fprintf(binaryFP, "\n");
+            }
             if(txtFP != NULL) fprintf(txtFP, "%s", buffer);
             fd=fd->next;
         }
@@ -93,9 +104,14 @@ void assembleVnodesTable(processInfoNode* head, FILE* binaryFP, FILE* txtFP)
         fdNode* fd = head->FD;
         while(fd != NULL)
         {
-            sprintf(buffer, "\t %d\t %d\n", fd->FD, fd->inode);
+            sprintf(buffer, "\t %d\t\t %d\n", fd->FD, fd->inode);
             printf("%s",buffer);
-            if(binaryFP != NULL) fprintf(binaryFP, buffer);
+            if(binaryFP != NULL) 
+            {
+                int intBuf[2] = {fd->FD, fd->inode};
+                fwrite(intBuf, sizeof(int), sizeof(intBuf) / sizeof(int), binaryFP);
+                fprintf(binaryFP, "\n");
+            }
             if(txtFP != NULL) fprintf(txtFP, "%s", buffer);
             fd=fd->next;
         }
@@ -118,7 +134,7 @@ void assembleCompositeTable(processInfoNode* head, FILE* binaryFP, FILE* txtFP)
             {
                 int intBuf[3] = {index, head->PID, fd->FD};
                 fwrite(intBuf, sizeof(int), sizeof(intBuf) / sizeof(int), binaryFP);
-                fprintf(binaryFP, "%s",fd->filename);
+                fwrite(fd->filename, sizeof(char), strlen(fd->filename), binaryFP);
                 fwrite(&fd->inode, sizeof(int), 1, binaryFP);
                 fprintf(binaryFP, "\n");
             }
@@ -234,6 +250,17 @@ int assemble(arguments* args, processInfoNode* root)
     if(args->threshold != -1)
     {
         printThreshold(root, args->threshold, binaryFP, txtFP);
+    }
+
+    // close file when needed
+    if(args->outputBinary)
+    {
+        fclose(binaryFP);
+    }
+    
+    if(args->outputTXT)
+    {
+        fclose(txtFP);
     }
     return 0;
 }

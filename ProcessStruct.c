@@ -96,7 +96,7 @@ int readArguments(int argc, char* argv[], arguments* args)
             {
                 printf("invalid threshold, exiting\n");
                 printf("usage: \n");
-                exit(-1);
+                return -1;
             }
         }
         else if(strncmp("--output_TXT", argv[i], 12)==0)
@@ -111,12 +111,14 @@ int readArguments(int argc, char* argv[], arguments* args)
         {
             printf("invalid argument, exiting\n");
             printf("usage: \n");
+            return -1;
         }
     }
 
     //default behaviour
     if(!args->perProcess && !args->systemWide && !args->vnodes)
         args->composite=true;
+    return 0;
 }
 
 void deleteProcessList(processInfoNode* head)
