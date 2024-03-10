@@ -114,7 +114,14 @@ void assembleCompositeTable(processInfoNode* head, FILE* binaryFP, FILE* txtFP)
         {
             sprintf(buffer, "%d\t %d\t %d\t %s\t\t %d\n", index, head->PID, fd->FD, fd->filename, fd->inode);
             printf("%s",buffer);
-            if(binaryFP != NULL) fprintf(binaryFP, buffer);
+            if(binaryFP != NULL) 
+            {
+                int intBuf[3] = {index, head->PID, fd->FD};
+                fwrite(intBuf, sizeof(int), sizeof(intBuf) / sizeof(int), binaryFP);
+                fprintf(binaryFP, "%s",fd->filename);
+                fwrite(&fd->inode, sizeof(int), 1, binaryFP);
+                fprintf(binaryFP, "\n");
+            }
             if(txtFP != NULL) fprintf(txtFP, "%s", buffer);
             fd=fd->next;
             index++;
