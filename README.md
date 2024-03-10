@@ -45,6 +45,59 @@ Also, I wanted to modify the flag name to make them follow the same convention (
 - If no argument is passed to the program, the program will display the composite table (same effect as using the `--composite` flag).
 
 ## IO observation
+statistics:
+- using `time ./MyFDViewer --output_binary`
+    - 1 |real	0m0.081s| user	0m0.010s | sys	0m0.046s
+    - 2 |real	0m0.042s| user	0m0.018s | sys	0m0.022s
+    - 3 |real	0m0.078s| user	0m0.012s | sys	0m0.036s
+    - 4 |real	0m0.035s| user	0m0.011s | sys	0m0.023s
+    - 5 |real	0m0.066s| user	0m0.015s | sys	0m0.040s
+    - 6 |real	0m0.034s| user	0m0.016s | sys	0m0.016s
+    - Mean |real 0m0.056s| user 0m0.015s| sys 0m0.031s
+    - Std Dev |real 0m0.019s| user 0m0.003s| sys 0m0.010s
+    - file size| 173.2kb
+
+- using `time ./MyFDViewer --output_TXT`
+    - 1 |real	0m0.081s| user	0m0.011s | sys	0m0.048s
+    - 2 |real	0m0.078s| user	0m0.010s | sys	0m0.032s
+    - 3 |real	0m0.081s| user	0m0.012s | sys	0m0.035s
+    - 4 |real	0m0.034s| user	0m0.009s | sys	0m0.024s
+    - 5 |real	0m0.040s| user	0m0.009s | sys	0m0.032s
+    - 6 |real	0m0.034s| user	0m0.008s | sys	0m0.026s
+    - Mean |real 0m0.058s| user 0m0.010s| sys 0m0.033s
+    - Std Dev |real 0m0.021s| user 0m0.001s| sys 0m0.008s
+    - file size| 207.8kb
+
+- using `time ./MyFDViewer --output_binary 1444`
+    - 1 |real	0m0.037s| user	0m0.012s | sys	0m0.026s
+    - 2 |real	0m0.034s| user	0m0.008s | sys	0m0.027s
+    - 3 |real	0m0.025s| user	0m0.011s | sys	0m0.015s
+    - 4 |real	0m0.025s| user	0m0.010s | sys	0m0.016s
+    - 5 |real	0m0.025s| user	0m0.008s | sys	0m0.017s
+    - 6 |real	0m0.024s| user	0m0.016s | sys	0m0.009s
+    - Mean |real 0m0.028s| user 0m0.011s| sys 0m0.018s
+    - Std Dev |real 0m0.006s| user 0m0.002s| sys 0m0.006s
+    - file size 4.3kb
+
+- using `time ./MyFDViewer --output_TXT 1444`
+    - 1 |real	0m0.036s| user	0m0.008s | sys	0m0.029s
+    - 2 |real	0m0.033s| user	0m0.013s | sys	0m0.021s
+    - 3 |real	0m0.029s| user	0m0.007s | sys	0m0.023s
+    - 4 |real	0m0.036s| user	0m0.014s | sys	0m0.024s
+    - 5 |real	0m0.027s| user	0m0.004s | sys	0m0.024s
+    - 6 |real	0m0.027s| user	0m0.004s | sys	0m0.024s
+    - Mean |real 0m0.031s| user 0m0.008s| sys 0m0.024s
+    - Std Dev |real 0m0.003s| user 0m0.004s| sys 0m0.002s
+    - file size 5.0kb
+
+From the stats above, we can see that the binary file size is much larger than the TXT output file, which make sense since we know a integer usually take less size compare to store it as a string. For example, an integer like 12345 would take up five bytes (one for each digit). In a binary file, the same integer would only take up 4 bytes (assuming a 32-bit integer). 
+
+The execution time when using the --output_binary option is generally slightly less than when using the --output_TXT option, both with and without the additional parameter 1444 (i.e. both in term of big and small sample). This suggests that the binary output may be more efficient in terms of execution time. This follows what we said in class and make sense since writing binary skip the process of converting a integer to a character.
+
+The system time is larger then user time across all test cases, this might suggest my program is IO-bounded since it spend a lot of time waiting for system-level I/O operations to complete.
+
+One peculiar thing I found is the first execution of specific command always seems to take the longest time. For example, the first execution of `./MyFDViewer --output_TXT --composite --systemWide --Vnodes --per-process` takes 0.120 seconds, the rest of the call are around 0.050 and 0.080 seconds. Perhaps system is optimizing the cache , therefore, if I execute the same command a few time in a row, the running time would be reduced. Suppose this assumption is true, we can see that `./MyFDViewer --output_binary --composite --systemWide --Vnodes --per-process` takes 0.080 seconds for the first time, which is a lot faster tha txt output. This support my first observation. Also, executing the same command a few moment later will get close result, i.e. 0.080 second.
+
 
 ##  Function Overview
 ### `ProcessStruct`
