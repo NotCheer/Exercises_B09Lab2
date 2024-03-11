@@ -95,7 +95,7 @@ int readArguments(int argc, char* argv[], arguments* args)
             if(strcmp("", tmp)!=0)
             {
                 printf("invalid threshold, exiting\n");
-                printf("usage: \n");
+                printUsage();
                 return -1;
             }
         }
@@ -110,7 +110,7 @@ int readArguments(int argc, char* argv[], arguments* args)
         else
         {
             printf("invalid argument, exiting\n");
-            printf("usage: \n");
+            printUsage();
             return -1;
         }
     }
@@ -134,4 +134,20 @@ void deleteFDList(fdNode* head)
     if(head == NULL) return;
     deleteFDList(head->next);
     free(head);
+}
+
+void printUsage()
+{
+    printf("\nUsage: ./MyFDViewer [flags]\n");
+
+    printf("| Flag            | Description |\n");
+    printf("|-----------------|-------------|\n");
+    printf("| --per-process   | Display the process FD table |\n");
+    printf("| --systemWide    | Display the system-wide FD table |\n");
+    printf("| --Vnodes        | Display the Vnodes FD table |\n");
+    printf("| --composite     | Display the composite table |\n");
+    printf("| --threshold=X   | Flag processes with a number of FD assigned larger than X in the output. It lists the PID and number of assigned FDs, e.g. PID (FD) |\n");
+    printf("| --output_TXT    | Save the \"composite\" table in text (ASCII) format into a file named `compositeTable.txt` |\n");
+    printf("| --output_binary | Save the \"composite\" table in binary format into a file named `compositeTable.bin` |\n\n");
+
 }

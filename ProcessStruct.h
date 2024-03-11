@@ -112,4 +112,9 @@ void deleteProcessList(processInfoNode* head);
  */
 void deleteFDList(fdNode* head);
 
+/* 
+ * Print the usage information
+ */
+void printUsage();
+
 #endif // PROCESS_STRUCT_H
